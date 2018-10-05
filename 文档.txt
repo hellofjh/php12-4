@@ -1,0 +1,342 @@
+﻿url三种访问方式
+1.thinkphp.com/index.php/index/Index/index
+2.thinkphp.com/index/Index/index
+//有些web服务器不支持pathinfo方式因此产生出来的一种兼容模式的格式
+3.thinkphp.com/index.php?s=/index/Index/index
+
+TP中的配置(重点)
+1.惯例配置：thinkphp/convention.php
+2.应用配置：application\config.php与application\database.php
+3.扩展配置: application/extra目录下文件名称无要求
+4.场景配置：
+5.模块配置：application/模块名称/config.php
+6.动态配置
+
+使用Config类动态配置
+use think\Config;
+Config::get()  //获取配置内容
+Config::get('database')  //获取配置内容
+Config::get('database.type')  //获取配置内容
+Config::set('database.hostname','192.168.1.1')	//设置配置内容
+
+使用助手函数动态配置
+config('database.hostname')	//获取配置内容
+config('database.hostname','192.168.1.1')	//设置配置内容
+
+模块配置：只针对当前模块生效(index--config.php / admin--config.php)
+
+场景配置：(公司开发/家中开发)
+application\home.php
+application\office.php
+application\config.php
+
+扩展配置
+app\extra\memcache.php
+app\extra\redia.php
+
+配置文件的优先级
+惯例配置->应用配置->扩展配置->场景配置->模块配置->动态配置
+配置文件的优先级与加载顺序相反
+
+TP中的路由 -- 简化用户的URL地址（默认混合模式）
+use think\Route;
+路由设置	--	url
+1.Route::rule('getConfig','admin/Index/getConfig');  --  www.tp5.com/getConfig	
+2.Route::rule('getConfig/:id','admin/Index/getConfig');  --  www.tp5.com/getConfig/30
+3.Route::rule('getConfig/[:id]','admin/Index/getConfig');  --  www.tp5.com/getConfig/[可不写/30]
+4.Route::rule('getConfig/:g_id/[:id]','admin/Index/getConfig');  --  www.tp5.com/getConfig/10/[可不写/20]
+5.Route::rule('test_gcf$','admin/Index/getConfig');  --  www.tp5.com/test_gcf
+6.Route::rule('test_gcf$','admin/Index/getConfig?id=10');  --  www.tp5.com/test_gcf
+7.Route::rule('getConfig','admin/Index/getConfig','*',['ext'=>'html']);  --  www.tp5.com/getConfig.html
+//限制每一个参数所传递的格式，格式可以使用正则表达式检查
+8.Route::rule('getConfig/:id','admin/Index/getConfig','*',[],['id'=>'\d+']);  --  www.tp5.com/getConfig/30
+
+//批量路由注册
+1.
+Route::rule([
+	'getConfig'=>'admin/Index/getConfig',
+	'index'=>'index/index/index'
+]);
+
+2.
+return [
+	'getConfig'=>'admin/Index/getConfig',
+	'index'=>'index/index/index'
+	];
+
+跳转/重定向(success/error/redirect)
+this->success('success','跳转')
+this->error('error','跳转')
+
+视图文件/目录与控制器文件/名录
+---------------------------------
+视图文件目录名要与控制器文件名一致
+视图文件名要与控制器方法名一致
+---------------------------------
+视图使用
+return $this->fetch()
+return view()
+----------前提要use View类------------
+$view = new view();
+return $view->fetch();
+
+---------------------------------******-----------------------------------
+url : http://www.thinkphp.com/admin/index/viewIndex
+public function viewIndex(){
+	//同名目录下调用testview文件
+	return $this->fetch('testview');
+	//渲染view/goods目录，调用view下的goods目录(不是本目录)中的index文件
+	return $this->fetch('goods/index');
+	// 跨模块渲染模板
+	return $this->fetch('index@index/index');
+	// 完整地址方式渲染
+	return $this->fetch('../application/index/view/index/index.html');
+}
+---------------------------------******-----------------------------------
+视图2
+assign分配:
+assign('data','{字符串,数组}');----
+//{$data}----字符串
+//{$data['name']}-----数组
+--------------------------------------------------------
+
+Db数据库操作
+// 使用name获取到到对象 不带前缀的表名称
+$obj = Db::name('user');
+// 使用table方法获取对象 需要传递完整表名称
+$obj = Db::table('tp_user');
+// 使用助手函数获取对象
+$obj = db('user');
+
+数据的增删改查
+一维数组($data)--> $obj->insert($data);
+二维数组($data)--> $obj->insertAll($data);
+//获取最后执行的sql语句
+echo $obj->getLastSql();
+//获取写入的数据id
+echo $obj->getLastInsID();
+//查询指定数据表的一条数据
+find(4)
+//查询指定数据表的所有数据
+select([2,3,4,5])
+//查询一列
+cloumn(['指定字段'])
+//更新指定数据
+updata(['name'=>'fengjunhao','id'=>1]);
+$obj->where('id',1)->update(['name'=>'update']);
+//删除数据
+delete(2)
+delete([1,2,3,4])
+
+聚合查询
+$obj->count('id');
+
+静态文件url格式
+{:url('admin/index/top')}
+
+URL生成
+url('地址表达式',[参数],['URL后缀'],['域名'])
+[参数]：
+1、'id=10&type=3'
+2、['id'=>10,'type'=>3]
+
+请求
+instance方法获取对象：
+	$request = Request::instance();
+助手函数获取对象：
+	$request = request();
+依赖注入获取对象：
+	class index(Request $request)
+判断请求方法
+		dump($request->isGet());//判断get方法
+		dump($request->isPost());//判断post方法
+获取请求相关信息
+		echo $request->module();//获取模块名称
+		echo $request->controller();//获取控制器名
+		echo $request->action();//获取方法名
+		echo $request->pathinfo();//pathinfo内容
+		...
+tp请求方式
+input('请求方式方法名称.参数名称/修饰符','默认值','过滤的函数名称')
+http://www.thinkphp.com/admin/test/requestMethod/id/3?name=hao
+input()//默认获取所有param中的参数
+input('id')//默认获取param中的参数
+input('get.')//
+input('get.name')//
+
+修饰符
+s：强制转换字符串
+d：强制转换整形
+b：强制转换布尔型
+a：强制转换数组
+r：强制转换浮点型
+
+视图2：
+内置模板常量
+__ROOT__
+__URL__
+__STATIC__
+__CSS__
+__JS__
+自定义模板常量设置
+application/config.php
+
+系统模板变量
+{Think.}
+
+模板函数
+{$变量|函数名称=参数1,参数2,参数3|函数名称2=参数1,参数2}
+{$data.addtime|date='Y-m-d',###};
+* (方法中的完全按照原生php写法) 
+{:方法}
+
+内置标签
+由于if标签的condition属性里面基本上使用的是php语法，尽可能使用判断标签和Switch标签会更加简洁，原则上来说，能够用switch和比较标签解决的尽量不用if标签完成。
+
+比较标签：
+eq：等于
+neq：不等于
+gt：大于
+egt：大于等于
+lt：小于
+elt：小于等于
+---------------------------------------------
+{eq name="$data" value="3"}yes{else/}no{/eq}
+
+循环输出标签(volist)
+{volist name="" id="" offset="" length="" mod="" empty="" key=""}{/volist}
+Name:指定循环的变量名称
+Id：指定每一次循环的临时变量
+Offset：指定偏移量
+Length：指定循环的次数
+Mod：计算器
+Empty：内容为空时输出的结果
+Key:指定循环的次数($key:默认输出下标)
+-------------------------Model操作----------------------------
+Model操作(model文件名要跟数据表一致)
+助手函数实例化对象
+model('model')
+引用方式实例化对象(推荐)
+use app\index\model\User;
+
+查询一条数据
+User::get(1);
+查询多条数据
+User::all([3,4,5]);
+User::all(['id'=>['gt',3]]);
+$model->where('id','>',3)->select()
+
+//增加数据
+$model->save([数据]);
+save(['name'=>'hao','id'=>3])
+$model->saveAll([数据]/$data);
+[数据]:数组
+//过滤数据表中非法字段
+$model->allowField(true)
+//表示修改操作
+$model->isUpdate(true)
+
+//删除
+$model->where('id',3)->delete();
+//根据主键删除
+$model->destroy([1,2,3])
+
+//如果需要过滤非数据表字段的数据，可以使用：
+allowField(true)-save();
+//通过外部提交赋值给模型，并且希望指定某些字段写入，可以使用：
+allowField(['name','email'])->save();
+
+
+//模型类可以使用静态调用或者实例化调用两种方式
+$hasSon = Category::get(1);
+
+
+模型/控制器(跳转/重定向):
+model:
+	// 设置属性记录错误信息
+		$this->error = '含有子分类';
+		return false;
+controller:
+	if($return === false){
+		// 使用getError方法来获取模型错误信息
+		$this->error($model->getError());
+	}
+
+Session::
+tp方法设置session：
+设置---
+Session::set('name','123');
+获取---
+Session::get('name');
+删除---
+Session::delete('name');
+
+助手函数：：
+session('name','123',['think']);
+session('name');
+session('name',null);
+session(null);
+session(null,'think');
+
+Cookie::(使用方法与session基本一致,多加一个时间)
+Cookie::set('name','123',3600);
+cookie('name','1234',3600);
+
+验证码：：html页面设置
+{:captcha_img()}
+验证码信息最终保存在session中
+
+生产验证码
+// 第三方验证方法调用
+$obj = new \think\captcha\Captcha();
+return $obj->entry();
+//创建验证方法
+$obj = new \think\captcha\Captcha();
+dump($obj->check());
+
+//哈希加密
+$passwordHash=password_hash('root', PASSWORD_DEFAULT);
+if(password_verify('root1', $passwordHash)){
+	return "zhengque";
+}
+
+//生成唯一
+$data['goods_sn'] = strtoupper('SHOP'.uniqid());
+
+//验证器
+1、use think\Validate;
+2、 $data = ['username'=>'leo'];
+	$vali = ['username'=>'require|length:6,24'];
+3、$validate = new validate($vali);
+4、dump($validate->check($data));
+
+//token令牌
+模板生成令牌后会自动生成session数据
+模板生成令牌：{:token()}
+
+模板继承：
+{extend name="./public/base" /}
+{block name="body"}[没内容就继承，有内容就替换]{/block}
+
+分页：
+controller/model(paginate(3))：
+$data = $obj->alias('a')->join('category b','a.cate_id=b.id','left')->paginate(3);
+view:
+{$data->render()}
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------***-----------------------------
+模型操作数据库
+模型下model---->
+new \app\admin\model\对应数据表类名
+对应数据表的类名::get()

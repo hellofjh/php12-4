@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<form action="" method="post">
+		<input type="text" name="one" value="">
+		<input type="text" name="two">
+		<input type="submit" name="" value="gogo">
+	</form>
+	<!-- {eq name="$data" value="3"}yes{else/}no{/eq} -->
+	{volist name="data" id="value" key="k"}
+		{$value.name}<br/>
+		key:{$key}<br/>
+	{/volist}
+</body>
+</html>
