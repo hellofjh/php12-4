@@ -103,7 +103,7 @@ class Goods extends Model{
 	}
 
 	//商品号的检测
-	public function checkGoodsSn(&$data){
+	public function checkGoodsSn(&$data,$method='add'){
 		if($data['goods_sn']){
 			//检测唯一
 			if(Goods::get(['goods_sn'=>$data['goods_sn']])){
@@ -113,6 +113,37 @@ class Goods extends Model{
 			//生成唯一
 			$data['goods_sn'] = strtoupper('SHOP'.uniqid());
 		}
+	}
+
+	public function editGoods(){
+		$data = input();
+		// 考虑取消勾选操作后 没有内容提交无法更新状态
+		if(!isset($data['is_hot'])){
+			$data['is_hot']=0;
+		}
+		if(!isset($data['is_new'])){
+			$data['is_new']=0;
+		}
+		if(!isset($data['is_rec'])){
+			$data['is_rec']=0;
+		}
+		// 检查数据合法性
+		$obj = validate('Goods');
+		if($obj->check($data) === FALSE){
+			$this->error = $obj->getError();
+			return FALSE;
+		}
+		// 检查货号
+		if($this->checkGoodsSn($data,'edit') === FALSE){
+			$this->error = '货号错误';
+			return FALSE;
+		}
+		// 实现商品图片上传 编辑图片上传不是必须
+		if($this->uploadGoodsThumb($data,FALSE) ===FALSE){
+			return FALSE;
+		}
+		// 修改数据
+		Goods::allowField(true)->isUpdate(true)->save($data,['id'=>$data['id']]);
 	}
 
 }

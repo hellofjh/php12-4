@@ -67,14 +67,39 @@ class Goods extends Common{
 		$id = input('id');
 		$data = db('goods')->where('id',$id)->update(['is_del'=>0]);
 		// dump($data);exit;
-		$this->success('商品编号$id已经还原','goodsList');
+		$this->success('商品编号$id已经还原','goodstrash');
 	}
 
 	public function remove(){
 		$id = input('id');
 		$data = db('goods')->where('id',$id)->delete();
 		// dump($data);exit;
-		$this->success('商品编号$id已经彻底删除','goodsList');
+		$this->success('商品编号$id已经彻底删除','goodstrash');
+	}
+
+	public function goodsEdit(){
+
+		$id = input('id');
+
+		if($this->request->isGet()){
+			$data = db('goods')->where('id',$id)->find();
+			$this->assign('data',$data);
+
+			// 获取所有分类
+			$category = model('Category');
+			$categorytree = $category->getCateTree();
+			$this->assign('tree',$categorytree);
+
+			return $this->fetch();
+		}
+
+		$model = model('Goods');
+		$result = $model->editGoods();
+		if($result === FALSE){
+			$this->error($model->getError());
+		}
+		$this->success('ok','goodsList');
+
 	}
 
 }
