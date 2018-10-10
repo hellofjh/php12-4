@@ -4,7 +4,7 @@ use think\Controller;
 
 class category extends Common{
 //-------------------------显示分类列表--------------------------------------
-	public function list(){
+	public function index(){
 		//判断get访问显示分类添加模板
 		if($this->request->isGet()){
 			$category = model('Category')->getCateTree();

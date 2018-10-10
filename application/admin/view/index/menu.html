@@ -146,7 +146,39 @@ body {
             类别管理
                 <ul>
                     <li class="menu-item"><a href="{:url('admin/category/add')}" target="main-frame">类别分类</a></li>
-                    <li class="menu-item"><a href="{:url('admin/category/list')}" target="main-frame">类别列表</a></li>
+                    <li class="menu-item"><a href="{:url('admin/category/index')}" target="main-frame">类别列表</a></li>
+                </ul>
+            </li>
+
+            <li class="explode" key="02_cat_and_goods" name="menu">
+            属性管理
+                <ul>
+                    <li class="menu-item"><a href="{:url('admin/attribute/add')}" target="main-frame">属性添加</a></li>
+                    <li class="menu-item"><a href="{:url('admin/attribute/index')}" target="main-frame">属性列表</a></li>
+                </ul>
+            </li>
+
+            <li class="explode" key="02_cat_and_goods" name="menu">
+            管理员用户管理
+                <ul>
+                    <li class="menu-item"><a href="{:url('admin/admin/add')}" target="main-frame">用户添加</a></li>
+                    <li class="menu-item"><a href="{:url('admin/admin/index')}" target="main-frame">用户列表</a></li>
+                </ul>
+            </li>
+
+            <li class="explode" key="02_cat_and_goods" name="menu">
+            权限管理
+                <ul>
+                    <li class="menu-item"><a href="{:url('admin/rule/add')}" target="main-frame">权限添加</a></li>
+                    <li class="menu-item"><a href="{:url('admin/rule/index')}" target="main-frame">权限列表</a></li>
+                </ul>
+            </li>
+
+            <li class="explode" key="02_cat_and_goods" name="menu">
+            角色管理
+                <ul>
+                    <li class="menu-item"><a href="{:url('admin/role/add')}" target="main-frame">角色添加</a></li>
+                    <li class="menu-item"><a href="{:url('admin/role/index')}" target="main-frame">属性列表</a></li>
                 </ul>
             </li>
 
@@ -170,6 +202,24 @@ body {
             </li>
         </ul>
     </div>
+    <!-- <div id="menu-list">
+        <ul id="menu-ul">
+            {volist name="menus" id="vo"}
+            {eq name="$vo.parent_id" value="0"}
+            <li class="explode" key="02_cat_and_goods" name="menu">
+            {$vo.rule_name}
+                <ul>
+                    {volist name="menus" id="v"}
+                    {eq name="$v.parent_id" value="$vo.id"}
+                    <li class="menu-item"><a href="{:url($v['controller_name'].'/'.$v['action_name'])}" target="main-frame">{$v.rule_name}</a></li>
+                    {/eq}
+                    {/volist}
+                </ul>
+            </li>
+            {/eq}
+            {/volist}
+        </ul>
+    </div> -->
     <div id="help-div" style="display:none">
         <h1 id="help-title"></h1>
         <div id="help-content"></div>

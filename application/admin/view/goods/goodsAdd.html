@@ -3,12 +3,14 @@
 <div class="tab-div">
     <div id="tabbar-div">
         <p>
-            <span class="tab-front" id="general-tab">通用信息</span>
+            <span class="tab-front">通用信息</span>
+            <span class="tab-front">商品描述</span>
+            <span class="tab-front">商品属性</span>
         </p>
     </div>
     <div id="tabbody-div">
         <form enctype="multipart/form-data" action="" method="post">
-            <table width="90%" id="general-table" align="center">
+            <table width="90%" class="table" align="center">
                 <tr>
                     <td class="label">商品名称：</td>
                     <td><input type="text" name="goods_name" value=""size="30" />
@@ -79,12 +81,11 @@
                 </tr> -->
             </table>
 
-                        <style>
-                            .edui-default{width: 80%;margin: 0 auto;}
-                        </style>
+            <table width="90%" class="table" align="center" style="display: none">
+                <tr>
+                    <td class="label">商品描述：</td>
+                    <td>
                         <!-- 加载编辑器的容器 -->
-                        <!-- <br/> -->
-                        <h2 style="width: 80%;margin-left: 10%">商品描述：</h2>
                         <script id="container" name="goods_body" type="text/plain" style="min-height: 400px;"></script>
                         <!-- 配置文件 -->
                         <script type="text/javascript" src="__ADMIN__ueditor/ueditor.config.js"></script>
@@ -94,6 +95,26 @@
                         <script type="text/javascript">
                             var ue = UE.getEditor('container');
                         </script>
+                    </td>
+                </tr>
+            </table>
+
+            <table width="90%" class="table" align="center" style="display: none">
+                <tr>
+                    <td class="label">选择商品所属类型：</td>
+                    <td>
+                        <select name="type_id" id="selectType">
+                            <option value="0">选择类型</option>
+                            {volist name="type" id="vo"}
+                            <option value="{$vo.id}">{$vo.type_name}</option>
+                            {/volist}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label" colspan="2" id="showAttr"></td>
+                </tr>
+            </table>
 
 
             <div class="button-div">
@@ -104,4 +125,47 @@
     </div>
 </div>
 {/block}
-<!-- {block name="js"}{/block} -->
+{block name="js"}
+<script type="text/javascript">
+    $('#tabbar-div p span').click(function(){
+        // 将所有的table标签全部隐藏
+        $('.table').hide();
+        // 获取当前所点击的序号
+        var index = $(this).index();
+        // 将当前序号对应的table标签显示
+        $('.table').eq(index).show();
+    });
+    // ajax类型切换获取属性
+    $('#selectType').change(function(){
+        // 获取type_id
+        var type_id = $(this).val();
+        if(type_id<=0){
+            return;
+        }
+        $.ajax({
+            url:"{:url('showAttr')}",
+            data:{type_id:type_id},
+            type:'post',
+            success:function(data){
+                // ajax返回结果为组装好的HTML字符串
+                $('#showAttr').html(data);
+            }
+        })
+    });
+    // 单选属性复制
+    function clonethis(obj){
+        // 获取tr对象
+        var $tr = $(obj).parent().parent();
+        if($(obj).html()=='[+]'){
+            // 复制一个新的tr
+            var $newTr = $tr.clone();
+            // 将复制的tra标签转化为[-]
+            $newTr.find('a').html('[-]');
+            $tr.after($newTr);
+        }else{
+            // 符号为-删除点击的tr标签
+            $tr.remove();
+        }        
+    }
+</script>
+{/block}

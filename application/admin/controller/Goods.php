@@ -3,6 +3,23 @@ namespace app\admin\controller;
 // use app\admin\model\Category;
 
 class Goods extends Common{
+
+	// ajax请求获取属性
+	public function showAttr()
+	{
+		$type_id = input('type_id');
+
+		// 调用自定义方法根据type_id的值获取属性
+		$data = model('Attribute')->getAttrByTypeId($type_id);
+		// dump($data);
+		if(!$data){
+			return '没有数据';
+		}
+		$this->assign('data',$data);
+		return $this->fetch();
+	}
+
+
 	//测试ftp链接
 	// public function testMove()
 	// {
@@ -16,6 +33,10 @@ class Goods extends Common{
 	public function goodsAdd(){
 
 		if($this->request->isGet()){
+			//获取所有分类信息
+			$type = model('Type')->getAllInfo();
+			$this->assign('type',$type);
+
 			//获取到分类信息数据
 			$category = new \app\admin\model\Category;
 			// dump($category);

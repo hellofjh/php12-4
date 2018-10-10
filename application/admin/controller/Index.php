@@ -1,27 +1,29 @@
-<?php
-
+<?php 
 namespace app\admin\controller;
-use think\Controller;
 
-class index extends Common{
-	//显示首页
-	public function index(){
-		return view();
+/**
+* 后台首页的控制器
+*/
+class Index extends Common
+{
+	public function index()
+	{
+		return $this->fetch();
 	}
-	//显示内容
-	public function main(){
-		return view();
+	public function menu()
+	{
+		// dump($this->admin['menus']);
+		// 赋值
+		$this->assign('menus',$this->admin['menus']);
+		return $this->fetch();
 	}
-	//显示顶部
-	public function top(){
-		return view();
+	public function main()
+	{
+		return $this->fetch();
 	}
-	//显示菜单
-	public function menu(){
-		return view();
+	public function top()
+	{
+		return $this->fetch();
 	}
-
-
 }
-
 ?>

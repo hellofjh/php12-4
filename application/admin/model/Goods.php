@@ -62,7 +62,19 @@ class Goods extends Model{
 		$data['addtime'] = time();
 		//写入数据
 		// new \app\admin\model\Goods;
-		Goods::allowField(true)->save($data);
+		// Goods::allowField(true)->save($data);
+		// 写入数据
+		Goods::startTrans();//开启事物
+		try{
+			Goods::allowField(true)->save($data);
+			$goods_id = Goods::getLastInsID();//获取写入数据的主键
+			model('GoodsAttr')->insertData($goods_id,input('attr_id/a'),input('attr/a'));
+			Goods::commit();
+		}catch(\Exception $e){
+			Goods::rollback();
+			$this->error = '数据写入错误';
+			return FALSE;
+		}
 	}
 
 	// 商品缩略图上传

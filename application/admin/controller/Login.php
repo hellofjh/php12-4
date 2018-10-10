@@ -25,7 +25,7 @@ class Login extends Common{
 
 //----------------------退出登陆---------------------------
 	public function logout(){
-		cookie('admin_id',null);
+		cookie('admin_info',null);
 		$this->success('退出成功','admin/login/login');
 	}
 //----------------------退出登陆---------------------------

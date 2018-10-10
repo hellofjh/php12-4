@@ -10,7 +10,8 @@ class Type extends Common
 	
 	public function index(){
 		
-		$data = db('type')->select();
+		// $data = db('type')->select();
+		$data = model('Type')->getAllInfo();
 		$this->assign('data',$data);
 		if($this->request->isGet()){
 			return $this->fetch();
@@ -23,6 +24,7 @@ class Type extends Common
 			return $this->fetch();
 		}
 		db('type')->insert(input());
+		model('Type')->updataCahe();
 		$this->success('ok','index');
 	}
 
@@ -42,6 +44,7 @@ class Type extends Common
 
 		$data = input();
 		db('type')->where('id',$id)->update($data);
+		model('Type')->updataCahe();
 		$this->success('ok','index');
 	}
 

@@ -11,7 +11,7 @@
 use think\Route;
 
 Route::rule('AdminS','admin/index/index');
-Route::rule('login','admin/login/login');
+// Route::rule('login','admin/login/login');
 
 return [
     '__pattern__' => [
