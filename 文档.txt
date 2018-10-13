@@ -326,6 +326,8 @@ view:
 
 
 
+//model中用来判断/验证数据库数据是否存在(有数据返回数据对象/没有则返回null)
+$this->get(['username'=>$data['username']]);
 
 
 
@@ -340,3 +342,40 @@ view:
 模型下model---->
 new \app\admin\model\对应数据表类名
 对应数据表的类名::get()
+
+// 商品缩略图上传
+	public function uploadGoodsThumb(&$data,$isMust=true)
+	{
+		// 1、使用request对象调用file方法获取File类对象
+		$file = request()->file('goods_img');
+		if(!$file){
+			if($isMust){
+				//必须上传图片
+				$this->error = '商品缩略图必须上传';
+				return FALSE;
+			}else{
+				// 非必须上传 由于没有图片终止后续代码
+				return TRUE;
+			}
+		}
+		// 2、调用move方法上传图片 使用validate方法限制格式
+		$info = $file->validate(['ext'=>'jpg,png'])->move('uploads');
+		if(!$info){
+			// 上传的文件异常
+			$this->error = $file->getError();
+			return FALSE;
+		}
+		// 组装上传的文件地址
+		// 将"\"符号转换为"/" 考虑linux下下将"\"不作为目录分隔符
+		$data['goods_img'] = str_replace('\\','/', $info->getPathName());
+		// 3、打开文件
+		$img = \think\Image::open($data['goods_img']);
+		//组装缩略图保存地址 缩略图保存地址与上传图片地址一致文件名称在上传文件名称前追加thumb_
+		//getFileName上传文件成功后获取文件的名称
+		$data['goods_thumb'] = 'uploads/'.date('Ymd').'/thumb_'.$info->getFileName();
+		// 4、生成缩略图
+		$img->thumb(100,100)->save($data['goods_thumb']);
+		// 将商品图片转移到资源服务器下
+		img_to_cdn($data['goods_img']);
+		img_to_cdn($data['goods_thumb']);
+	}

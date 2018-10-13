@@ -6,6 +6,7 @@
             <span class="tab-front">通用信息</span>
             <span class="tab-front">商品描述</span>
             <span class="tab-front">商品属性</span>
+            <span class="tab-front">商品相册</span>
         </p>
     </div>
     <div id="tabbody-div">
@@ -116,6 +117,21 @@
                 </tr>
             </table>
 
+            <table width="90%" class="table pic" align="center" style="display: none">
+                <tr>
+                    <td class="label"></td>
+                    <td >
+                        <input type="button" name="" id="addPic" value="增加图片">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">相册图片：</td>
+                    <td>
+                        <input type="file" name="pics[]">
+                    </td>
+                </tr>
+            </table>
+
 
             <div class="button-div">
                 <input type="submit" value=" 确定 " class="button"/>
@@ -127,6 +143,10 @@
 {/block}
 {block name="js"}
 <script type="text/javascript">
+    $('#addPic').click(function(){
+        var newTr = $(this).parent().parent().next().clone();
+        $('.pic').append(newTr);
+    });
     $('#tabbar-div p span').click(function(){
         // 将所有的table标签全部隐藏
         $('.table').hide();

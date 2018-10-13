@@ -4,12 +4,14 @@
 <div class="tab-div">
     <div id="tabbar-div">
         <p>
-            <span class="tab-front" id="general-tab">通用信息</span>
+            <span class="tab-front">通用信息</span>
+            <span class="tab-front">商品描述</span>
+            <span class="tab-front">商品相册</span>
         </p>
     </div>
     <div id="tabbody-div">
         <form enctype="multipart/form-data" action="" method="post">
-            <table width="90%" id="general-table" align="center">
+            <table width="90%" class="table" align="center">
                 <tr>
                     <td class="label">商品名称：</td>
                     <td><input type="text" name="goods_name" value="{$data.goods_name}" size="30" />
@@ -103,12 +105,12 @@
                     </td>
                 </tr> -->
             </table>
-                        <style>
-                            .edui-default{width: 80%;margin: 0 auto;}
-                        </style>
+
+            <table width="90%" class="table" align="center" style="display: none">
+                <tr>
+                    <td class="label">商品描述：</td>
+                    <td>
                         <!-- 加载编辑器的容器 -->
-                        <!-- <br/> -->
-                        <h2 style="width: 80%;margin-left: 10%">商品描述：</h2>
                         <script id="container" name="goods_body" type="text/plain" style="min-height: 400px;">{$data.goods_body|htmlspecialchars_decode}</script>
                         <!-- 配置文件 -->
                         <script type="text/javascript" src="__ADMIN__ueditor/ueditor.config.js"></script>
@@ -118,6 +120,30 @@
                         <script type="text/javascript">
                             var ue = UE.getEditor('container');
                         </script>
+                    </td>
+                </tr>
+            </table>
+            <table width="90%" class="table pic" align="center" style="display: none">
+                <tr>
+                    <td  colspan="2">
+                        {volist name="pics" id="vo"}
+                        <div style="float: left;margin: 10px;"><img src="{$Think.config.resource_domain}{$vo.goods_thumb}" width="100" height="100"><input type="button" value="删除" name="" class="delPic" data-img-id="{$vo.id}"></div>
+                        {/volist}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"></td>
+                    <td >
+                        <input type="button" name="" id="addPic" value="增加图片">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">相册图片：</td>
+                    <td>
+                        <input type="file" name="pics[]">
+                    </td>
+                </tr>
+            </table>
 
             <div class="button-div">
                 <input type="submit" value=" 确定 " class="button"/>
@@ -127,4 +153,35 @@
     </div>
 </div>
 
+{/block}
+
+{block name="js"}
+<script type="text/javascript">
+    $('.delPic').click(function(){
+        // 触发ajax
+        var obj = $(this).parent();//div对应的对象
+        var img_id = $(this).attr('data-img-id');
+        $.ajax({
+            type:'post',
+            url:'{:url("delPic")}',
+            data:{img_id:img_id},
+            success:function(){
+                // 移除当前的dom元素
+                obj.remove();
+            }
+        })
+    });
+    $('#addPic').click(function(){
+        var newTr = $(this).parent().parent().next().clone();
+        $('.pic').append(newTr);
+    });
+    $('#tabbar-div p span').click(function(){
+        // 将所有的table标签全部隐藏
+        $('.table').hide();
+        // 获取当前所点击的序号
+        var index = $(this).index();
+        // 将当前序号对应的table标签显示
+        $('.table').eq(index).show();
+    });
+</script>
 {/block}

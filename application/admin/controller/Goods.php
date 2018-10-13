@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 // use app\admin\model\Category;
+use think\Db;
 
 class Goods extends Common{
 
@@ -33,6 +34,7 @@ class Goods extends Common{
 	public function goodsAdd(){
 
 		if($this->request->isGet()){
+
 			//获取所有分类信息
 			$type = model('Type')->getAllInfo();
 			$this->assign('type',$type);
@@ -52,6 +54,7 @@ class Goods extends Common{
 		if($model_data === false){
 			$this->error($model->getError());
 		}
+
 		$this->success('success','goodsList');
 
 	}
@@ -111,6 +114,10 @@ class Goods extends Common{
 			$categorytree = $category->getCateTree();
 			$this->assign('tree',$categorytree);
 
+			//获取已有相册
+			$pics = db('goods_img')->where('goods_id',$id)->select();
+			$this->assign('pics',$pics);
+
 			return $this->fetch();
 		}
 
@@ -121,6 +128,12 @@ class Goods extends Common{
 		}
 		$this->success('ok','goodsList');
 
+	}
+
+	public function delPic(){
+		$img_id = input('img_id/d');
+		Db::name('goods_img')->where('id',$img_id)->delete();
+		return json(['status'=>1,'msg'=>'ok']);
 	}
 
 }

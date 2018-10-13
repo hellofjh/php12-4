@@ -1,5 +1,6 @@
 <?php
 namespace app\admin\model;
+use think\Db;
 use think\Model;
 
 class Goods extends Model{
@@ -68,6 +69,8 @@ class Goods extends Model{
 		try{
 			Goods::allowField(true)->save($data);
 			$goods_id = Goods::getLastInsID();//获取写入数据的主键
+			//实现商品相册上传
+			$this->uploadPics($goods_id);
 			model('GoodsAttr')->insertData($goods_id,input('attr_id/a'),input('attr/a'));
 			Goods::commit();
 		}catch(\Exception $e){
@@ -114,6 +117,42 @@ class Goods extends Model{
 		img_to_cdn($data['goods_thumb']);
 	}
 
+	// 相册上传
+	public function uploadPics($goods_id)
+	{
+		// 1、获取上传数组格式的对象
+		$files = request()->file('pics');
+		$list = [];
+		// 循环上传
+		foreach ($files as $file) {
+			$info = $file->validate(['ext'=>'jpg,png'])->move('uploads');
+			if(!$info){
+				return FALSE;
+			}
+			// 组装上传的文件地址
+			// 将"\"符号转换为"/" 考虑linux下下将"\"不作为目录分隔符
+			$goods_img = str_replace('\\','/', $info->getPathName());
+			// 3、打开文件
+			$img = \think\Image::open($goods_img);
+			//组装缩略图保存地址 缩略图保存地址与上传图片地址一致文件名称在上传文件名称前追加thumb_
+			//getFileName上传文件成功后获取文件的名称
+			$goods_thumb = 'uploads/'.date('Ymd').'/thumb_'.$info->getFileName();
+			// 4、生成缩略图
+			$img->thumb(100,100)->save($goods_thumb);
+			// 将商品图片转移到资源服务器下
+			img_to_cdn($goods_img);
+			img_to_cdn($goods_thumb);
+			$list[]=[
+				'goods_id'=>$goods_id,
+				'goods_img'=>$goods_img,
+				'goods_thumb'=>$goods_thumb
+			];
+		}
+		if($list){
+			Db::name('goods_img')->insertAll($list);
+		}
+	}
+
 	//商品号的检测
 	public function checkGoodsSn(&$data,$method='add'){
 		if($data['goods_sn']){
@@ -156,6 +195,9 @@ class Goods extends Model{
 		}
 		// 修改数据
 		Goods::allowField(true)->isUpdate(true)->save($data,['id'=>$data['id']]);
+
+		//实现商品的相册上传
+		$this->uploadPics($data['id']);
 	}
 
 }

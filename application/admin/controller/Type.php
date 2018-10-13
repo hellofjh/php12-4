@@ -24,7 +24,7 @@ class Type extends Common
 			return $this->fetch();
 		}
 		db('type')->insert(input());
-		model('Type')->updataCahe();
+		model('Type')->updateCahe();
 		$this->success('ok','index');
 	}
 
@@ -44,7 +44,7 @@ class Type extends Common
 
 		$data = input();
 		db('type')->where('id',$id)->update($data);
-		model('Type')->updataCahe();
+		model('Type')->updateCahe();
 		$this->success('ok','index');
 	}
 
