@@ -4,6 +4,7 @@
   `pwd` varchar(255) NOT NULL,
   `role_id` int(11) NOT NULL,
   PRIMARY KEY (`id`) hell
+  word
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
 
  tp_category | CREATE TABLE `tp_category` (
